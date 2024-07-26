@@ -1,4 +1,4 @@
-﻿import tkinter as tk
+import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox  # Importe diretamente a função messagebox
 
@@ -8,7 +8,7 @@ class Vender(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         
-        self.lista_compras = []  # Lista para armazenar os itens de compra
+        self.lista_vendas = []  # Lista para armazenar os itens de venda
         
         # Criar widgets
         self.lbl_item = tk.Label(self, text="Item:")
@@ -57,14 +57,17 @@ class Vender(tk.Frame):
         if not item_selecionado:
             messagebox.showwarning("Aviso", "Selecione um item da lista disponível.")
             return
-        
-        item_id, item_name = self.itens_disponiveis[item_selecionado[0]]
+
+        item_text = self.lista_disponiveis.get(item_selecionado)
+        item_id = item_text.split("(ID: ")[1][:-1]  # Extrair o ID do texto
+        item_name = item_text.split(" (ID: ")[0]
+
         preco = self.ent_preco.get()
         if not preco:
             messagebox.showwarning("Aviso", "Digite um valor para o preço.")
             return
-        
-        self.lista_compras.append((item_name, item_id, preco))
+
+        self.lista_vendas.append((item_name, item_id, preco))
         self.atualizar_lista()
         self.ent_item.delete(0, tk.END)
         self.ent_preco.delete(0, tk.END)
@@ -73,12 +76,12 @@ class Vender(tk.Frame):
         selecionado = self.lista_box.curselection()
         if selecionado:
             indice = selecionado[0]
-            del self.lista_compras[indice]
+            del self.lista_vendas[indice]
             self.atualizar_lista()
         
     def atualizar_lista(self):
         self.lista_box.delete(0, tk.END)
-        for item_name, item_id, preco in self.lista_compras:
+        for item_name, item_id, preco in self.lista_vendas:
             self.lista_box.insert(tk.END, f"{item_name} (ID: {item_id}) - R${preco}")
     
     def carregar_itens_disponiveis(self):
@@ -94,13 +97,14 @@ class Vender(tk.Frame):
         for item in root.findall("item"):
             item_id = item.get("id")
             item_name = item.get("name")
-            self.itens_disponiveis.append((item_id, item_name))
-            self.lista_disponiveis.insert(tk.END, f"{item_name} (ID: {item_id})")
+            if item_id is not None and item_name is not None:  # Verifica se item_id e item_name não são None
+                self.itens_disponiveis.append((item_id, item_name))
+                self.lista_disponiveis.insert(tk.END, f"{item_name} (ID: {item_id})")
     
     def filtrar_itens_disponiveis(self, event):
         # Filtra os itens disponíveis de acordo com o que o usuário digita
         filtro = self.ent_item.get().lower()
         self.lista_disponiveis.delete(0, tk.END)
         for item_id, item_name in self.itens_disponiveis:
-            if filtro in item_name.lower():
+            if item_name is not None and item_id is not None and (filtro in item_name.lower() or filtro in item_id):
                 self.lista_disponiveis.insert(tk.END, f"{item_name} (ID: {item_id})")
