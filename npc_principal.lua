@@ -53,9 +53,7 @@ end
 npcHandler:addModule(FocusModule:new(), npcConfig.name, true, true, true)
 
 npcConfig.shop = {	
-	{ itemName = "Ancient Shield", clientId = 3432, buy = 8000 },
-	--sell
-	{ itemName = "Amazon Shield", clientId = 3437, sell = 25000 },
+	
 
 }
 -- On buy npc shop message
@@ -70,6 +68,3 @@ end
 npcType.onCheckItem = function(npc, player, clientId, subType) end
 
 npcType:register(npcConfig)
-
-
-
